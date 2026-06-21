@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Streaming TV</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_source_label">Anbieter-Typ (Betreiber)</string>
+    <string name="source_stalker">Stalker / MAG Portal</string>
+    <string name="source_m3u">M3U Playlist</string>
+    <string name="label_portal_url">Portal-URL</string>
+    <string name="hint_portal_url">http://server:port/c/</string>
+    <string name="label_mac">MAC-Adresse</string>
+    <string name="hint_mac">00:1A:79:XX:XX:XX</string>
+    <string name="action_generate_mac">MAC generieren</string>
+    <string name="action_copy_mac">MAC kopieren</string>
+    <string name="mac_for_provider">Diese MAC dem Betreiber geben:</string>
+    <string name="mac_placeholder">00:1A:79:00:00:00</string>
+    <string name="mac_hint">Der Betreiber aktiviert deine Linie für genau diese MAC-Adresse.</string>
+    <string name="label_m3u_url">M3U Playlist-URL</string>
+    <string name="hint_m3u_url">http://server/playlist.m3u8</string>
+    <string name="action_save">Speichern</string>
+    <string name="settings_saved">Gespeichert</string>
+    <string name="settings_incomplete">Bitte alle benötigten Felder ausfüllen.</string>
+    <string name="mac_copied">MAC kopiert: %1$s</string>
+
+    <!-- Browse -->
+    <string name="row_all_channels">Alle Sender</string>
+
+    <!-- Toasts -->
+    <string name="toast_configure_first">Bitte zuerst den Anbieter einrichten.</string>
+    <string name="toast_no_channels">Keine Sender gefunden. Prüfe Portal/MAC oder Playlist.</string>
+    <string name="toast_load_failed">Laden fehlgeschlagen.</string>
+    <string name="toast_play_failed">Wiedergabe fehlgeschlagen.</string>
+    <string name="toast_stream_error">Stream-Fehler: %1$s</string>
+</resources>
