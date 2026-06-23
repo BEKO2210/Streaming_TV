@@ -47,11 +47,31 @@ class Prefs(context: Context) {
             SourceType.M3U_PLAYLIST -> m3uUrl.isNotBlank()
         }
 
+    /** IDs of channels the user marked as favorites. */
+    var favorites: Set<String>
+        get() = sp.getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
+        private set(value) = sp.edit { putStringSet(KEY_FAVORITES, value) }
+
+    fun isFavorite(id: String): Boolean = favorites.contains(id)
+
+    /** Toggles favorite state and returns the new state (true = now favorite). */
+    fun toggleFavorite(id: String): Boolean {
+        val current = favorites.toMutableSet()
+        val added = if (current.contains(id)) {
+            current.remove(id); false
+        } else {
+            current.add(id); true
+        }
+        favorites = current
+        return added
+    }
+
     companion object {
         private const val KEY_SOURCE_TYPE = "source_type"
         private const val KEY_PORTAL_URL = "portal_url"
         private const val KEY_MAC = "mac_address"
         private const val KEY_M3U_URL = "m3u_url"
+        private const val KEY_FAVORITES = "favorites"
 
         /**
          * Generates a random MAC address using the 00:1A:79 prefix that MAG

@@ -91,6 +91,8 @@ class SettingsActivity : FragmentActivity() {
             Toast.makeText(this, getString(R.string.settings_incomplete), Toast.LENGTH_LONG).show()
             return
         }
+        // Force a fresh session/catalog next time the browse screen loads.
+        com.streamingtv.player.data.AppRepository.reset(this)
         Toast.makeText(this, getString(R.string.settings_saved), Toast.LENGTH_SHORT).show()
         finish()
     }
