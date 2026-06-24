@@ -20,7 +20,7 @@ import com.streamingtv.player.data.Category
 import com.streamingtv.player.data.Channel
 import com.streamingtv.player.data.Playlist
 import com.streamingtv.player.data.Prefs
-import com.streamingtv.player.ui.details.DetailsActivity
+import com.streamingtv.player.ui.playback.PlaybackActivity
 import com.streamingtv.player.ui.search.SearchActivity
 import com.streamingtv.player.ui.settings.SettingsActivity
 import kotlinx.coroutines.launch
@@ -30,6 +30,7 @@ class MainFragment : BrowseSupportFragment() {
     private lateinit var prefs: Prefs
     private val rowsAdapter = ArrayObjectAdapter(ListRowPresenter())
     private var lastConfigSignature: String? = null
+    private var lastRenderSignature: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +51,7 @@ class MainFragment : BrowseSupportFragment() {
 
         onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
             when (item) {
-                is Channel -> openDetails(item)
+                is Channel -> playChannel(item)
                 is MenuItem -> onMenuItem(item)
             }
         }
@@ -73,15 +74,19 @@ class MainFragment : BrowseSupportFragment() {
         val signature = configSignature()
         when {
             !prefs.isConfigured -> promptSetup()
-            // Rebuild from cache when config unchanged (reflects favorite edits fast).
-            AppRepository.playlist != null && signature == lastConfigSignature ->
-                buildRows(AppRepository.playlist!!)
+            AppRepository.playlist != null && signature == lastConfigSignature -> {
+                // Only rebuild (which resets scroll position) when favorites
+                // actually changed; otherwise keep the grid as the user left it.
+                if (renderSignature() != lastRenderSignature) buildRows(AppRepository.playlist!!)
+            }
             else -> loadContent(signature)
         }
     }
 
     private fun configSignature() =
         "${prefs.sourceType}|${prefs.portalUrl}|${prefs.macAddress}|${prefs.m3uUrl}"
+
+    private fun renderSignature() = prefs.favorites.sorted().joinToString(",")
 
     private fun promptSetup() {
         rowsAdapter.clear()
@@ -150,6 +155,7 @@ class MainFragment : BrowseSupportFragment() {
             add(MenuItem(MenuItem.ID_SETTINGS, getString(R.string.action_settings)))
         }
         rowsAdapter.add(ListRow(HeaderItem(getString(R.string.row_system)), menuAdapter))
+        lastRenderSignature = renderSignature()
     }
 
     private fun row(title: String, items: List<Channel>, presenter: CardPresenter): ListRow {
@@ -168,10 +174,20 @@ class MainFragment : BrowseSupportFragment() {
         }
     }
 
-    private fun openDetails(channel: Channel) {
-        startActivity(Intent(requireContext(), DetailsActivity::class.java).apply {
-            putExtra(DetailsActivity.EXTRA_CHANNEL_ID, channel.id)
-        })
+    /** Resolves the stream URL and jumps straight into playback. */
+    private fun playChannel(channel: Channel) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val url = AppRepository.get(requireContext()).resolvePlayUrl(channel)
+                startActivity(PlaybackActivity.intent(requireContext(), url, channel.name, channel.id))
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    e.message ?: getString(R.string.toast_play_failed),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     private fun openSettings() {

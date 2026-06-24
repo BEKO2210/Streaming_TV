@@ -41,7 +41,7 @@
     <string name="search_results">%1$d Treffer</string>
 
     <!-- Player HUD -->
-    <string name="hud_hint">▲▼ Sender   ◀ Liste   ▶ Optionen   OK Info   0–9 Sender-Nr.   Grün Favorit   Rot zuletzt</string>
+    <string name="hud_hint">▲▼◀▶ Sender wechseln   OK Senderliste   OK halten/Menü Optionen   0–9 Nummer   Grün Favorit   Rot zuletzt</string>
     <string name="options_title">Optionen</string>
     <string name="opt_aspect">Bildformat</string>
     <string name="opt_video">Video: %1$s</string>

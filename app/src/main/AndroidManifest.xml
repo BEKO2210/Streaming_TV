@@ -44,11 +44,6 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name=".ui.details.DetailsActivity"
-            android:exported="false"
-            android:screenOrientation="landscape" />
-
-        <activity
             android:name=".ui.search.SearchActivity"
             android:exported="false"
             android:screenOrientation="landscape" />

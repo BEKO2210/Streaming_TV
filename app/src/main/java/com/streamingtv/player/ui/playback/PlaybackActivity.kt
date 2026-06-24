@@ -9,6 +9,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import androidx.leanback.widget.BaseGridView
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -104,6 +105,9 @@ class PlaybackActivity : FragmentActivity() {
         currentIndex = activeChannels().indexOfFirst { it.id == current?.id }
         setupChannelList()
         binding.panelOptionList.adapter = optionAdapter
+        binding.panelOptionList.windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
+        binding.panelOptionList.windowAlignmentOffsetPercent = 33f
+        binding.panelOptionList.itemAlignmentOffsetPercent = 0f
         // Keep D-pad focus inside the options panel (swallow horizontal moves).
         binding.panelOptionList.setOnKeyInterceptListener { event ->
             event.action == KeyEvent.ACTION_DOWN &&
@@ -155,6 +159,11 @@ class PlaybackActivity : FragmentActivity() {
         )
         channelAdapter.setCurrent(current?.id)
         binding.panelChannelList.adapter = channelAdapter
+        // Keep the focused row ~1/3 down so the list scrolls smoothly instead of
+        // pinning the selection to the panel edge.
+        binding.panelChannelList.windowAlignment = BaseGridView.WINDOW_ALIGN_NO_EDGE
+        binding.panelChannelList.windowAlignmentOffsetPercent = 33f
+        binding.panelChannelList.itemAlignmentOffsetPercent = 0f
         binding.panelChannelList.setOnKeyInterceptListener { event ->
             if (event.action == KeyEvent.ACTION_DOWN) when (event.keyCode) {
                 KeyEvent.KEYCODE_DPAD_LEFT -> { cycleGroup(-1); true }
@@ -174,10 +183,14 @@ class PlaybackActivity : FragmentActivity() {
         val group = groups.getOrNull(groupIndex) ?: return
         binding.panelCategory.text = getString(R.string.group_header, group.name)
         channelAdapter.submit(group.channels, prefs.favorites, current?.id)
-        val sel = group.channels.indexOfFirst { it.id == current?.id }.coerceAtLeast(0)
+        val max = (group.channels.size - 1).coerceAtLeast(0)
+        val sel = group.channels.indexOfFirst { it.id == current?.id }.coerceIn(0, max)
+        // Wait for the freshly submitted items to lay out before selecting/focusing.
         binding.panelChannelList.post {
             binding.panelChannelList.selectedPosition = sel
-            binding.panelChannelList.requestFocus()
+            if (!binding.panelChannelList.requestFocus()) {
+                binding.panelChannelList.post { binding.panelChannelList.requestFocus() }
+            }
         }
     }
 
@@ -608,15 +621,22 @@ class PlaybackActivity : FragmentActivity() {
             return true
         }
         when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP ->
+            // Up/down AND left/right all change channel while watching.
+            KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_CHANNEL_UP,
+            KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_MEDIA_PREVIOUS ->
                 if (panel == Panel.NONE) { zap(-1); return true }
-            KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN ->
+            KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_CHANNEL_DOWN,
+            KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_MEDIA_NEXT ->
                 if (panel == Panel.NONE) { zap(+1); return true }
-            KeyEvent.KEYCODE_DPAD_LEFT ->
-                if (panel == Panel.NONE) { openChannels(); return true }
-            KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_MENU ->
+            // OK: tap = channel list, hold = options (handled in onKeyUp/LongPress).
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER ->
+                if (panel == Panel.NONE) {
+                    if (event?.repeatCount == 0) event.startTracking()
+                    return true
+                }
+            KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_PROG_YELLOW ->
                 if (panel == Panel.NONE) { openSettings(); return true }
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_INFO ->
+            KeyEvent.KEYCODE_INFO ->
                 if (panel == Panel.NONE) {
                     if (binding.infoBar.visibility == View.VISIBLE) hideInfoBar() else showInfoBar()
                     return true
@@ -630,6 +650,27 @@ class PlaybackActivity : FragmentActivity() {
             }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        if (panel == Panel.NONE &&
+            (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
+        ) {
+            openSettings()
+            return true
+        }
+        return super.onKeyLongPress(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (panel == Panel.NONE &&
+            (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER)
+        ) {
+            // Short tap (long press already opened options and cancels the up).
+            if (event != null && event.isTracking && !event.isCanceled) openChannels()
+            return true
+        }
+        return super.onKeyUp(keyCode, event)
     }
 
     override fun onBackPressed() {
