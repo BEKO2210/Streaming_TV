@@ -86,7 +86,8 @@ class MainFragment : BrowseSupportFragment() {
     private fun configSignature() =
         "${prefs.sourceType}|${prefs.portalUrl}|${prefs.macAddress}|${prefs.m3uUrl}"
 
-    private fun renderSignature() = prefs.favorites.sorted().joinToString(",")
+    private fun renderSignature() =
+        prefs.favorites.sorted().joinToString(",") + "#" + prefs.recentIds().joinToString(",")
 
     private fun promptSetup() {
         rowsAdapter.clear()
@@ -97,6 +98,7 @@ class MainFragment : BrowseSupportFragment() {
     private fun loadContent(signature: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             rowsAdapter.clear()
+            progressBarManager.show()
             try {
                 val playlist = AppRepository.get(requireContext()).load()
                 AppRepository.playlist = playlist
@@ -112,6 +114,8 @@ class MainFragment : BrowseSupportFragment() {
                     Toast.LENGTH_LONG
                 ).show()
                 openSettings()
+            } finally {
+                progressBarManager.hide()
             }
         }
     }
@@ -119,8 +123,15 @@ class MainFragment : BrowseSupportFragment() {
     private fun buildRows(playlist: Playlist) {
         rowsAdapter.clear()
         val cardPresenter = CardPresenter(prefs)
+        val byId = playlist.allItems.associateBy { it.id }
 
-        // Favorites first.
+        // Recently watched (keeps the most-recent order).
+        val recents = prefs.recentIds().mapNotNull { byId[it] }
+        if (recents.isNotEmpty()) {
+            rowsAdapter.add(row(getString(R.string.row_recent), recents, cardPresenter))
+        }
+
+        // Favorites.
         val favIds = prefs.favorites
         if (favIds.isNotEmpty()) {
             val favs = playlist.allItems.filter { favIds.contains(it.id) }

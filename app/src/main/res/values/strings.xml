@@ -18,6 +18,13 @@
     <string name="label_m3u_url">M3U Playlist-URL</string>
     <string name="hint_m3u_url">http://server/playlist.m3u8</string>
     <string name="action_save">Speichern</string>
+    <string name="action_test">Verbindung testen</string>
+    <string name="test_running">Teste Verbindung…</string>
+    <string name="test_ok">✓ Verbunden – %1$d Sender gefunden</string>
+    <string name="test_ok_empty">✓ Verbunden, aber keine Sender gefunden</string>
+    <string name="test_fail">✗ %1$s</string>
+    <string name="test_need_portal">Bitte Portal-URL und MAC eingeben.</string>
+    <string name="test_need_m3u">Bitte M3U-URL eingeben.</string>
     <string name="settings_saved">Gespeichert</string>
     <string name="settings_incomplete">Bitte alle benötigten Felder ausfüllen.</string>
     <string name="mac_copied">MAC kopiert: %1$s</string>
@@ -25,6 +32,7 @@
     <!-- Browse -->
     <string name="row_all_channels">Alle Sender</string>
     <string name="row_favorites">★ Favoriten</string>
+    <string name="row_recent">Zuletzt gesehen</string>
     <string name="row_system">System</string>
     <string name="label_movie">Film</string>
     <string name="action_refresh">Aktualisieren</string>

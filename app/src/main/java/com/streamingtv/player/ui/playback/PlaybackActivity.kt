@@ -125,6 +125,7 @@ class PlaybackActivity : FragmentActivity() {
         }
         initPlayer()
         playUrl(url, current?.name.orEmpty())
+        current?.id?.let { prefs.addRecent(it) }
         showInfoBar()
         loadEpg()
         handler.post(tickRunnable)
@@ -265,6 +266,7 @@ class PlaybackActivity : FragmentActivity() {
         }
         currentIndex = activeChannels().indexOfFirst { it.id == channel.id }
         channelAdapter.setCurrent(channel.id)
+        prefs.addRecent(channel.id)
         showInfoBar()
         zapJob?.cancel()
         zapJob = lifecycleScope.launch {
