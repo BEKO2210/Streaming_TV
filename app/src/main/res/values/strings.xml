@@ -40,6 +40,30 @@
     <!-- Search -->
     <string name="search_results">%1$d Treffer</string>
 
+    <!-- Player HUD -->
+    <string name="hud_hint">▲▼ Sender   ◀ Liste   ▶ Optionen   OK Info   0–9 Sender-Nr.   Grün Favorit   Rot zuletzt</string>
+    <string name="options_title">Optionen</string>
+    <string name="opt_aspect">Bildformat</string>
+    <string name="opt_video">Video: %1$s</string>
+    <string name="opt_audio">Audio: %1$s</string>
+    <string name="opt_subtitle">Untertitel: %1$s</string>
+    <string name="opt_off">Aus</string>
+    <string name="opt_auto">Automatisch</string>
+    <string name="opt_favorite_add">★ Zu Favoriten hinzufügen</string>
+    <string name="opt_favorite_remove">★ Favorit entfernen</string>
+    <string name="opt_stream_info">Stream: %1$d×%2$d</string>
+    <string name="aspect_fit">Anpassen</string>
+    <string name="aspect_zoom">Zoom (Vollbild)</string>
+    <string name="aspect_fill">Strecken</string>
+    <string name="aspect_width">Feste Breite</string>
+    <string name="aspect_height">Feste Höhe</string>
+    <string name="group_all">Alle Sender</string>
+    <string name="group_favorites">★ Favoriten</string>
+    <string name="group_header">%1$s   ◀ ▶</string>
+    <string name="toast_channel_not_found">Sender %1$s nicht gefunden</string>
+    <string name="toast_favorite_added">%1$s zu Favoriten hinzugefügt</string>
+    <string name="toast_favorite_removed">%1$s aus Favoriten entfernt</string>
+
     <!-- Toasts -->
     <string name="toast_configure_first">Bitte zuerst den Anbieter einrichten.</string>
     <string name="toast_no_channels">Keine Sender gefunden. Prüfe Portal/MAC oder Playlist.</string>

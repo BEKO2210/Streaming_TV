@@ -37,9 +37,17 @@ data class Channel(
 data class EpgProgram(
     val title: String,
     val description: String?,
-    val start: String?,
-    val end: String?
-) : Serializable
+    val startMs: Long?,
+    val endMs: Long?
+) : Serializable {
+    /** Playback progress 0..1 for [now], or null if timing is unknown. */
+    fun progressAt(now: Long): Float? {
+        val s = startMs ?: return null
+        val e = endMs ?: return null
+        if (e <= s) return null
+        return ((now - s).toFloat() / (e - s)).coerceIn(0f, 1f)
+    }
+}
 
 /** Which kind of provider ("Betreiber") the user is connecting to. */
 enum class SourceType {

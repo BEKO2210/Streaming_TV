@@ -119,8 +119,8 @@ class StalkerClient(
             EpgProgram(
                 title = title,
                 description = o.optString("descr").takeIf { it.isNotBlank() },
-                start = o.optString("t_time").takeIf { it.isNotBlank() },
-                end = o.optString("t_time_to").takeIf { it.isNotBlank() }
+                startMs = o.optLong("start_timestamp", 0L).takeIf { it > 0 }?.let { it * 1000 },
+                endMs = o.optLong("stop_timestamp", 0L).takeIf { it > 0 }?.let { it * 1000 }
             )
         }
     }
