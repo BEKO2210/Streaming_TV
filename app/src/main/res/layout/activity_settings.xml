@@ -18,9 +18,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_title"
+            android:fontFamily="@font/inter_bold"
             android:textColor="@color/brand_text"
             android:textSize="28sp"
-            android:textStyle="bold" />
+            android:letterSpacing="-0.01" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -71,9 +72,12 @@
                 android:id="@+id/input_portal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:autofillHints="url"
+                android:background="@drawable/bg_input"
                 android:hint="@string/hint_portal_url"
                 android:inputType="textUri"
+                android:padding="14dp"
                 android:textColor="@color/brand_text"
                 android:textColorHint="@color/brand_text_dim" />
 
@@ -88,9 +92,13 @@
                 android:id="@+id/input_mac"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:autofillHints="username"
+                android:background="@drawable/bg_input"
+                android:fontFamily="monospace"
                 android:hint="@string/hint_mac"
                 android:inputType="textCapCharacters"
+                android:padding="14dp"
                 android:textColor="@color/brand_text"
                 android:textColorHint="@color/brand_text_dim" />
 
@@ -102,14 +110,12 @@
 
                 <Button
                     android:id="@+id/button_generate_mac"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/PremiumButton"
                     android:text="@string/action_generate_mac" />
 
                 <Button
                     android:id="@+id/button_copy_mac"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    style="@style/PremiumButton"
                     android:layout_marginStart="16dp"
                     android:text="@string/action_copy_mac" />
             </LinearLayout>
@@ -170,9 +176,12 @@
                 android:id="@+id/input_m3u"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:autofillHints="url"
+                android:background="@drawable/bg_input"
                 android:hint="@string/hint_m3u_url"
                 android:inputType="textUri"
+                android:padding="14dp"
                 android:textColor="@color/brand_text"
                 android:textColorHint="@color/brand_text_dim" />
         </LinearLayout>
@@ -186,14 +195,12 @@
 
             <Button
                 android:id="@+id/button_save"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/PremiumButton"
                 android:text="@string/action_save" />
 
             <Button
                 android:id="@+id/button_test"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/PremiumButton"
                 android:layout_marginStart="16dp"
                 android:text="@string/action_test" />
 

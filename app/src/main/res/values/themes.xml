@@ -4,16 +4,36 @@
         <item name="android:colorPrimary">@color/brand_accent</item>
         <item name="android:colorAccent">@color/brand_accent</item>
         <item name="android:windowBackground">@color/brand_background</item>
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:textColor">@color/brand_text</item>
+        <item name="rowHeaderStyle">@style/RowHeaderPremium</item>
+        <item name="browseTitleTextStyle">@style/BrowseTitlePremium</item>
     </style>
 
-    <style name="DetailsButton" parent="Widget.AppCompat.Button">
+    <style name="RowHeaderPremium" parent="Widget.Leanback.Row.Header">
+        <item name="android:fontFamily">@font/inter_semibold</item>
+        <item name="android:textColor">@color/brand_text</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+
+    <style name="BrowseTitlePremium" parent="Widget.Leanback.Title.Text">
+        <item name="android:fontFamily">@font/inter_bold</item>
+        <item name="android:textColor">@color/brand_text</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <!-- Pill-style buttons -->
+    <style name="PremiumButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minWidth">180dp</item>
-        <item name="android:textColor">@color/brand_text</item>
-        <item name="android:background">@drawable/bg_menu_card</item>
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/bg_button</item>
+        <item name="android:fontFamily">@font/inter_semibold</item>
+        <item name="android:textColor">@color/btn_text_color</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minWidth">160dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">28dp</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

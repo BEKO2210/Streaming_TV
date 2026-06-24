@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="brand_background">#0E1116</color>
-    <color name="brand_surface">#1A1F27</color>
-    <color name="brand_text">#FFFFFF</color>
-    <color name="brand_text_dim">#9AA4B2</color>
-    <color name="brand_accent">#3DDC84</color>
-    <color name="brand_accent_dark">#1B5E36</color>
+    <!-- Premium dark palette: cool near-black with layered surfaces -->
+    <color name="brand_background">#0A0C10</color>
+    <color name="brand_background_2">#11141A</color>
+    <color name="brand_surface">#171B22</color>
+    <color name="brand_surface_2">#20252E</color>
+    <color name="brand_stroke">#2A2F3A</color>
+
+    <color name="brand_text">#F4F6FA</color>
+    <color name="brand_text_dim">#99A1B0</color>
+
+    <color name="brand_accent">#38E08A</color>
+    <color name="brand_accent_dark">#11422B</color>
+    <color name="brand_on_accent">#06140D</color>
+
+    <color name="scrim_70">#B3000000</color>
+    <color name="scrim_40">#66000000</color>
 </resources>
