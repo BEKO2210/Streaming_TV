@@ -6,11 +6,21 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.streamingtv.player.R
 import com.streamingtv.player.data.Prefs
 import com.streamingtv.player.data.SourceType
+import com.streamingtv.player.data.m3u.M3uParser
+import com.streamingtv.player.data.stalker.StalkerClient
 import com.streamingtv.player.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 /**
  * Lets the user configure their provider.
@@ -54,6 +64,70 @@ class SettingsActivity : FragmentActivity() {
         }
 
         binding.buttonSave.setOnClickListener { save() }
+        binding.buttonTest.setOnClickListener { testConnection() }
+    }
+
+    /**
+     * Validates the entered provider details by actually connecting, so the
+     * user knows the line works (and the MAC is activated) before saving.
+     */
+    private fun testConnection() {
+        val stalker = binding.radioStalker.isChecked
+        val portal = binding.inputPortal.text?.toString()?.trim().orEmpty()
+        val mac = binding.inputMac.text?.toString()?.trim().orEmpty()
+        val m3u = binding.inputM3u.text?.toString()?.trim().orEmpty()
+
+        if (stalker && (portal.isBlank() || mac.isBlank())) {
+            showResult(getString(R.string.test_need_portal), ok = false); return
+        }
+        if (!stalker && m3u.isBlank()) {
+            showResult(getString(R.string.test_need_m3u), ok = false); return
+        }
+
+        binding.testResult.text = getString(R.string.test_running)
+        binding.testResult.setTextColor(ContextCompat.getColor(this, R.color.brand_text))
+        binding.testProgress.visibility = View.VISIBLE
+        binding.buttonTest.isEnabled = false
+
+        lifecycleScope.launch {
+            val result = runCatching {
+                if (stalker) {
+                    val client = StalkerClient(portal, mac)
+                    client.connect()
+                    client.getChannels().size
+                } else {
+                    testM3u(m3u)
+                }
+            }
+            binding.testProgress.visibility = View.GONE
+            binding.buttonTest.isEnabled = true
+            result.onSuccess { count ->
+                if (count > 0) showResult(getString(R.string.test_ok, count), ok = true)
+                else showResult(getString(R.string.test_ok_empty), ok = true)
+            }.onFailure { e ->
+                showResult(getString(R.string.test_fail, e.message ?: e.javaClass.simpleName), ok = false)
+            }
+        }
+    }
+
+    private suspend fun testM3u(url: String): Int = withContext(Dispatchers.IO) {
+        val http = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .build()
+        val request = Request.Builder().url(url).header("User-Agent", "StreamingTV/1.0").build()
+        val body = http.newCall(request).execute().use { resp ->
+            if (!resp.isSuccessful) error("HTTP ${resp.code}")
+            resp.body?.string().orEmpty()
+        }
+        M3uParser.parse(body).channels.size
+    }
+
+    private fun showResult(message: String, ok: Boolean) {
+        binding.testResult.text = message
+        binding.testResult.setTextColor(
+            ContextCompat.getColor(this, if (ok) R.color.brand_accent else R.color.brand_text)
+        )
     }
 
     private fun bindCurrentValues() {

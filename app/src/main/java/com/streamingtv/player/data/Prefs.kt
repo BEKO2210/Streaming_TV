@@ -52,6 +52,17 @@ class Prefs(context: Context) {
         get() = sp.getStringSet(KEY_FAVORITES, emptySet()) ?: emptySet()
         private set(value) = sp.edit { putStringSet(KEY_FAVORITES, value) }
 
+    /** Channel/movie IDs the user watched, most-recent first. */
+    fun recentIds(): List<String> =
+        sp.getString(KEY_RECENTS, "")?.split(RECENTS_SEP)?.filter { it.isNotBlank() } ?: emptyList()
+
+    /** Records [id] as just watched, moving it to the front (capped list). */
+    fun addRecent(id: String) {
+        if (id.isBlank()) return
+        val updated = (listOf(id) + recentIds().filter { it != id }).take(MAX_RECENTS)
+        sp.edit { putString(KEY_RECENTS, updated.joinToString(RECENTS_SEP)) }
+    }
+
     fun isFavorite(id: String): Boolean = favorites.contains(id)
 
     /** Toggles favorite state and returns the new state (true = now favorite). */
@@ -72,6 +83,9 @@ class Prefs(context: Context) {
         private const val KEY_MAC = "mac_address"
         private const val KEY_M3U_URL = "m3u_url"
         private const val KEY_FAVORITES = "favorites"
+        private const val KEY_RECENTS = "recents"
+        private const val RECENTS_SEP = "\n"
+        private const val MAX_RECENTS = 15
 
         /**
          * Generates a random MAC address using the 00:1A:79 prefix that MAG

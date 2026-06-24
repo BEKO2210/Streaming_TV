@@ -36,7 +36,7 @@ class CardPresenter(private val prefs: Prefs) : Presenter() {
             channel.number != null -> "Nr. ${channel.number}"
             else -> ""
         }
-        val placeholder = ContextCompat.getDrawable(card.context, R.drawable.ic_tv_placeholder)
+        val placeholder = InitialsDrawable(channel.name)
         val imageView = card.mainImageView
         if (!channel.logoUrl.isNullOrBlank()) {
             imageView.load(channel.logoUrl) {

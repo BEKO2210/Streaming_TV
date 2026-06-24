@@ -177,12 +177,43 @@
                 android:textColorHint="@color/brand_text_dim" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/button_save"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="@string/action_save" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/action_save" />
+
+            <Button
+                android:id="@+id/button_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/action_test" />
+
+            <ProgressBar
+                android:id="@+id/test_progress"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="16dp"
+                android:indeterminateTint="@color/brand_accent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/test_result"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:textColor="@color/brand_text"
+                android:textSize="15sp" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

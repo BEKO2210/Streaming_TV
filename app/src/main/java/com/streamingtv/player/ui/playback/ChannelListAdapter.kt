@@ -58,13 +58,14 @@ class ChannelListAdapter(
         holder.name.text = channel.name
         holder.fav.visibility = if (favorites.contains(channel.id)) View.VISIBLE else View.GONE
         holder.itemView.isActivated = channel.id == currentId
+        val placeholder = com.streamingtv.player.ui.InitialsDrawable(channel.name)
         if (!channel.logoUrl.isNullOrBlank()) {
             holder.logo.load(channel.logoUrl) {
-                placeholder(R.drawable.ic_tv_placeholder)
-                error(R.drawable.ic_tv_placeholder)
+                placeholder(placeholder)
+                error(placeholder)
             }
         } else {
-            holder.logo.setImageResource(R.drawable.ic_tv_placeholder)
+            holder.logo.setImageDrawable(placeholder)
         }
         holder.itemView.setOnClickListener { onClick(channel) }
         holder.itemView.setOnFocusChangeListener { _, hasFocus ->
