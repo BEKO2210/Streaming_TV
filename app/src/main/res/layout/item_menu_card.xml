@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="120dp"
+    android:background="@drawable/bg_menu_card"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:padding="16dp"
+    android:textColor="@color/brand_text"
+    android:textSize="20sp"
+    android:textStyle="bold" />

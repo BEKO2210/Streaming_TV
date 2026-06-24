@@ -8,13 +8,23 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
 
-/** Bundles categories with their channels for the UI. */
+/** A category together with the items shown in its row. */
+data class Section(
+    val category: Category,
+    val items: List<Channel>
+)
+
+/** Everything the browse screen needs: live + VOD sections. */
 data class Playlist(
-    val categories: List<Category>,
-    val channels: List<Channel>
+    val liveCategories: List<Category>,
+    val liveChannels: List<Channel>,
+    val vodSections: List<Section> = emptyList()
 ) {
     fun channelsFor(categoryId: String): List<Channel> =
-        channels.filter { it.categoryId == categoryId }
+        liveChannels.filter { it.categoryId == categoryId }
+
+    /** Flat list of everything playable, used by search. */
+    val allItems: List<Channel> get() = liveChannels + vodSections.flatMap { it.items }
 }
 
 /**
@@ -38,20 +48,37 @@ class PlaylistRepository(private val prefs: Prefs) {
     /** Returns a directly playable URL, resolving Stalker commands if needed. */
     suspend fun resolvePlayUrl(channel: Channel): String {
         if (!channel.needsResolve) return channel.streamUrl
-        val client = stalker ?: StalkerClient(prefs.portalUrl, prefs.macAddress).also {
+        return stalkerClient().resolveStreamUrl(channel)
+    }
+
+    /** Now/next EPG for a live channel (empty for M3U or on failure). */
+    suspend fun loadEpg(channel: Channel): List<EpgProgram> {
+        if (prefs.sourceType != SourceType.STALKER_PORTAL || channel.isVod) return emptyList()
+        return runCatching { stalkerClient().getShortEpg(channel.id) }.getOrDefault(emptyList())
+    }
+
+    private suspend fun stalkerClient(): StalkerClient {
+        stalker?.let { return it }
+        return StalkerClient(prefs.portalUrl, prefs.macAddress).also {
             it.connect()
             stalker = it
         }
-        return client.resolveStreamUrl(channel)
     }
 
     private suspend fun loadStalker(): Playlist {
-        val client = StalkerClient(prefs.portalUrl, prefs.macAddress)
-        client.connect()
-        stalker = client
+        // Reconnect fresh so a reload picks up new credentials / session state.
+        stalker = null
+        val client = stalkerClient()
         val categories = client.getCategories().filterNot { it.id == "*" }
         val channels = client.getChannels()
-        return Playlist(categories, channels)
+        // VOD is best-effort: never let it break live TV.
+        val vodSections = runCatching {
+            client.getVodCategories().take(MAX_VOD_ROWS).mapNotNull { cat ->
+                val items = runCatching { client.getVodItems(cat.id) }.getOrDefault(emptyList())
+                if (items.isEmpty()) null else Section(cat, items)
+            }
+        }.getOrDefault(emptyList())
+        return Playlist(categories, channels, vodSections)
     }
 
     private suspend fun loadM3u(): Playlist = withContext(Dispatchers.IO) {
@@ -66,5 +93,9 @@ class PlaylistRepository(private val prefs: Prefs) {
         }
         val result = M3uParser.parse(body)
         Playlist(result.categories, result.channels)
+    }
+
+    companion object {
+        private const val MAX_VOD_ROWS = 8
     }
 }

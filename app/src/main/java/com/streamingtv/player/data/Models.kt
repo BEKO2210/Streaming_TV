@@ -8,8 +8,11 @@ data class Category(
     val title: String
 ) : Serializable
 
+/** What kind of content an item represents. */
+enum class ContentType { LIVE, VOD }
+
 /**
- * A single live channel.
+ * A single playable item (live channel or VOD title).
  *
  * For Stalker portals the actual stream URL is resolved lazily via
  * `create_link`, so [streamUrl] may be empty and [cmd] holds the portal
@@ -22,10 +25,21 @@ data class Channel(
     val logoUrl: String? = null,
     val categoryId: String? = null,
     val streamUrl: String = "",
-    val cmd: String? = null
+    val cmd: String? = null,
+    val contentType: ContentType = ContentType.LIVE,
+    val description: String? = null
 ) : Serializable {
     val needsResolve: Boolean get() = streamUrl.isBlank() && !cmd.isNullOrBlank()
+    val isVod: Boolean get() = contentType == ContentType.VOD
 }
+
+/** A single EPG (electronic program guide) entry. */
+data class EpgProgram(
+    val title: String,
+    val description: String?,
+    val start: String?,
+    val end: String?
+) : Serializable
 
 /** Which kind of provider ("Betreiber") the user is connecting to. */
 enum class SourceType {

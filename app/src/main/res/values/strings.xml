@@ -24,6 +24,21 @@
 
     <!-- Browse -->
     <string name="row_all_channels">Alle Sender</string>
+    <string name="row_favorites">★ Favoriten</string>
+    <string name="row_system">System</string>
+    <string name="label_movie">Film</string>
+    <string name="action_refresh">Aktualisieren</string>
+    <string name="action_settings">Einstellungen</string>
+
+    <!-- Details -->
+    <string name="action_play">Abspielen</string>
+    <string name="action_add_favorite">Zu Favoriten</string>
+    <string name="action_remove_favorite">Favorit entfernen</string>
+    <string name="epg_now">Jetzt: %1$s</string>
+    <string name="epg_next">Danach: %1$s</string>
+
+    <!-- Search -->
+    <string name="search_results">%1$d Treffer</string>
 
     <!-- Toasts -->
     <string name="toast_configure_first">Bitte zuerst den Anbieter einrichten.</string>

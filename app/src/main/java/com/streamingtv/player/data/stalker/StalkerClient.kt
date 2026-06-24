@@ -2,6 +2,8 @@ package com.streamingtv.player.data.stalker
 
 import com.streamingtv.player.data.Category
 import com.streamingtv.player.data.Channel
+import com.streamingtv.player.data.ContentType
+import com.streamingtv.player.data.EpgProgram
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -73,6 +75,56 @@ class StalkerClient(
         }
     }
 
+    /** Loads VOD categories (movies / series) from the portal. */
+    suspend fun getVodCategories(): List<Category> = withContext(Dispatchers.IO) {
+        val resp = call("type=vod&action=get_categories&JsHttpRequest=1-xml")
+        val arr = resp.optJSONArray("js") ?: return@withContext emptyList()
+        (0 until arr.length()).mapNotNull { i ->
+            val o = arr.optJSONObject(i) ?: return@mapNotNull null
+            val id = o.optString("id")
+            if (id.isBlank() || id == "*") null else Category(id, o.optString("title", "VOD $id"))
+        }
+    }
+
+    /** Loads VOD items for a category (first page). */
+    suspend fun getVodItems(categoryId: String): List<Channel> = withContext(Dispatchers.IO) {
+        val resp = call("type=vod&action=get_ordered_list&category=$categoryId&p=1&JsHttpRequest=1-xml")
+        val data = resp.optJSONObject("js")?.optJSONArray("data") ?: return@withContext emptyList()
+        (0 until data.length()).mapNotNull { i ->
+            val o = data.optJSONObject(i) ?: return@mapNotNull null
+            val id = o.optString("id")
+            if (id.isBlank()) return@mapNotNull null
+            // VOD items carry a numeric id; the create_link cmd is built from it.
+            Channel(
+                id = "vod_$id",
+                name = o.optString("name", "Film $id"),
+                logoUrl = o.optString("screenshot_uri").takeIf { it.isNotBlank() }?.let { absUrl(it) },
+                categoryId = categoryId,
+                cmd = o.optString("cmd").takeIf { it.isNotBlank() } ?: "/media/file_$id.mpg",
+                contentType = ContentType.VOD,
+                description = o.optString("description").takeIf { it.isNotBlank() }
+            )
+        }
+    }
+
+    /** Returns now/next program titles for a live channel (short EPG). */
+    suspend fun getShortEpg(channelId: String): List<EpgProgram> = withContext(Dispatchers.IO) {
+        val resp = runCatching {
+            call("type=itv&action=get_short_epg&ch_id=$channelId&JsHttpRequest=1-xml")
+        }.getOrNull() ?: return@withContext emptyList()
+        val arr = resp.optJSONArray("js") ?: return@withContext emptyList()
+        (0 until arr.length()).mapNotNull { i ->
+            val o = arr.optJSONObject(i) ?: return@mapNotNull null
+            val title = o.optString("name").takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            EpgProgram(
+                title = title,
+                description = o.optString("descr").takeIf { it.isNotBlank() },
+                start = o.optString("t_time").takeIf { it.isNotBlank() },
+                end = o.optString("t_time_to").takeIf { it.isNotBlank() }
+            )
+        }
+    }
+
     /**
      * Resolves the playable URL for a channel through `create_link`.
      * Portals usually return something like "ffmpeg http://real/stream";
@@ -80,8 +132,9 @@ class StalkerClient(
      */
     suspend fun resolveStreamUrl(channel: Channel): String = withContext(Dispatchers.IO) {
         val cmd = channel.cmd ?: throw StalkerException("Kanal hat kein abspielbares Kommando.")
+        val type = if (channel.isVod) "vod" else "itv"
         val encoded = URLEncoder.encode(cmd, "UTF-8")
-        val resp = call("type=itv&action=create_link&cmd=$encoded&JsHttpRequest=1-xml")
+        val resp = call("type=$type&action=create_link&cmd=$encoded&JsHttpRequest=1-xml")
         val raw = resp.optJSONObject("js")?.optString("cmd").orEmpty()
         if (raw.isBlank()) throw StalkerException("Stream-Link konnte nicht aufgelöst werden.")
         // Strip leading tokens like "ffmpeg " or "auto " and surrounding spaces.
