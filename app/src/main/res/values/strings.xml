@@ -35,6 +35,7 @@
     <string name="row_recent">Zuletzt gesehen</string>
     <string name="row_system">System</string>
     <string name="label_movie">Film</string>
+    <string name="badge_vod">FILM</string>
     <string name="action_refresh">Aktualisieren</string>
     <string name="action_settings">Einstellungen</string>
 

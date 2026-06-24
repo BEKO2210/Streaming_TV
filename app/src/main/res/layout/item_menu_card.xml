@@ -6,7 +6,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
+    android:fontFamily="@font/inter_semibold"
     android:padding="16dp"
     android:textColor="@color/brand_text"
-    android:textSize="20sp"
-    android:textStyle="bold" />
+    android:textSize="20sp" />

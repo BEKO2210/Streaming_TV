@@ -70,9 +70,9 @@
                     android:id="@+id/info_number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
                     android:textColor="@color/brand_accent"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
+                    android:textSize="26sp" />
 
                 <TextView
                     android:id="@+id/info_name"
@@ -81,10 +81,11 @@
                     android:layout_marginStart="14dp"
                     android:layout_weight="1"
                     android:ellipsize="end"
+                    android:fontFamily="@font/inter_bold"
+                    android:letterSpacing="-0.01"
                     android:maxLines="1"
                     android:textColor="@color/brand_text"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
+                    android:textSize="26sp" />
 
                 <TextView
                     android:id="@+id/info_badge"
@@ -168,10 +169,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:fontFamily="@font/inter_bold"
             android:maxLines="1"
             android:textColor="@color/brand_accent"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/panel_preview_now"
@@ -218,10 +219,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold"
             android:text="@string/options_title"
             android:textColor="@color/brand_accent"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textSize="22sp" />
 
         <androidx.leanback.widget.VerticalGridView
             android:id="@+id/panel_option_list"
@@ -246,9 +247,9 @@
         android:paddingTop="16dp"
         android:paddingEnd="32dp"
         android:paddingBottom="16dp"
+        android:fontFamily="@font/inter_bold"
         android:textColor="@color/brand_text"
         android:textSize="40sp"
-        android:textStyle="bold"
         android:visibility="gone" />
 
 </FrameLayout>
